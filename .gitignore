@@ -1,0 +1,10 @@
+iTunesRemote.Agent/iTunesRemote.Agent/bin/*
+iTunesRemote.Agent/iTunesRemote.Agent/obj/*
+iTunesRemote.Agent/iTunesRemote.Agent/*.user
+iTunesRemote.Agent/iTunesRemote.Agent.Setup/Debug/*
+iTunesRemote.Agent/iTunesRemote.Agent.Setup/Release/*
+iTunesRemote.WindowsPhone/iTunesRemote.WindowsPhone/obj/*
+iTunesRemote.WindowsPhone/iTunesRemote.WindowsPhone/bin/*
+iTunesRemote.WindowsPhone/iTunesRemote.WindowsPhone/*.user
+*/packages/*
+packages.config
