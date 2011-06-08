@@ -8,3 +8,5 @@ iTunesRemote.WindowsPhone/iTunesRemote.WindowsPhone/bin/*
 iTunesRemote.WindowsPhone/iTunesRemote.WindowsPhone/*.user
 */packages/*
 packages.config
+
+iTunesRemote.WindowsPhone/lib/Newtonsoft.Json.WindowsPhone.pdb
