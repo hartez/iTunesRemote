@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using iTunesLib;
+using iTunesModel;
 using Nancy;
 
 namespace iTunesRemote.Agent
@@ -126,7 +127,14 @@ namespace iTunesRemote.Agent
 			IITPlaylistCollection playlists = iTunes.LibrarySource.Playlists;
 			for (int n = 1; n <= playlists.Count; n++)
 			{
-				result.Add(new iTunesPlaylist(playlists[n].playlistID, playlists[n].Name));
+				var playlist = new iTunesPlaylist(playlists[n].playlistID, playlists[n].Name);
+
+				for(int t = 1; t < playlists[n].Tracks.Count; t++)
+				{
+					playlist.Tracks.Add(new Track(playlists[n].Tracks[t].Name));
+				}
+
+				result.Add(playlist);
 			}
 
 			return result;

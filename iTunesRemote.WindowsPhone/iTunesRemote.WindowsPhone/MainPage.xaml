@@ -5,13 +5,16 @@
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls" mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait" Orientation="Portrait"
-    shell:SystemTray.IsVisible="True">
+    shell:SystemTray.IsVisible="True"
+	DataContext="{Binding Library, Source={StaticResource Locator}}">
+	<phone:PhoneApplicationPage.Resources>
+	
+	</phone:PhoneApplicationPage.Resources>
 
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
@@ -23,29 +26,45 @@
         <!--TitlePanel contains the name of the application and page title-->
         <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,17,0,28">
             <TextBlock x:Name="ApplicationTitle" Text="iTunes Remote" Style="{StaticResource PhoneTextNormalStyle}"/>
-            <TextBlock x:Name="PageTitle" Text="Now Playing" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
+            <TextBlock x:Name="PageTitle" Text="{Binding CurrentTrack}" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}" FontSize="29.333"/>
         </StackPanel>
 
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-            <Button Content="Play/Pause" Height="72" HorizontalAlignment="Left" Margin="139,85,0,0" Name="PlayPauseButton" VerticalAlignment="Top" Width="Auto" Click="PlayPauseButtonClick" />
-            <TextBlock Height="30" HorizontalAlignment="Stretch" Margin="6,23,6,0" Name="CurrentTrack" Text="" VerticalAlignment="Top" />
-            <Button Content="Next" Height="72" HorizontalAlignment="Left" Margin="257,194,0,0" Name="NextButton" VerticalAlignment="Top" Width="160" Click="NextButtonClick" />
-            <Button Content="Previous" Height="72" HorizontalAlignment="Left" Margin="32,194,0,0" Name="PreviousButton" VerticalAlignment="Top" Width="160" Click="PreviousButtonClick"/>
-            <HyperlinkButton Content="Library" Height="30" HorizontalAlignment="Left" Margin="127,510,0,0" Name="LibraryButton" VerticalAlignment="Top" Width="200" NavigateUri="/Library.xaml" />
-        </Grid>
+
+			<controls:Pivot Title="Playlists"
+							x:Name="LibraryPivot"
+							ItemsSource="{Binding Playlists}">
+				<controls:Pivot.HeaderTemplate>
+					<DataTemplate>
+						<TextBlock Text="{Binding Name}" />
+					</DataTemplate>
+				</controls:Pivot.HeaderTemplate>
+				<controls:Pivot.ItemTemplate>
+					<DataTemplate>
+
+						<ListBox ItemsSource="{Binding Tracks}">
+							<ListBox.ItemTemplate>
+								<DataTemplate>
+									<TextBlock Text="{Binding Name}"></TextBlock>
+								</DataTemplate>
+							</ListBox.ItemTemplate>
+						</ListBox>
+
+					</DataTemplate>
+				</controls:Pivot.ItemTemplate>
+			</controls:Pivot>
+
+	    </Grid>
     </Grid>
  
-    <!--Sample code showing usage of ApplicationBar-->
-    <!--<phone:PhoneApplicationPage.ApplicationBar>
+    <phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
-            <shell:ApplicationBarIconButton IconUri="/Images/appbar_button1.png" Text="Button 1"/>
-            <shell:ApplicationBarIconButton IconUri="/Images/appbar_button2.png" Text="Button 2"/>
-            <shell:ApplicationBar.MenuItems>
-                <shell:ApplicationBarMenuItem Text="MenuItem 1"/>
-                <shell:ApplicationBarMenuItem Text="MenuItem 2"/>
-            </shell:ApplicationBar.MenuItems>
-        </shell:ApplicationBar>
-    </phone:PhoneApplicationPage.ApplicationBar>-->
+            <shell:ApplicationBarIconButton IconUri="/Buttons/rew.png" Text="previous"/>
+            <shell:ApplicationBarIconButton IconUri="/Buttons/play.png" Text="play"/>
+			<shell:ApplicationBarIconButton IconUri="/Buttons/ff.png"
+											Text="next" />
+		</shell:ApplicationBar>
+    </phone:PhoneApplicationPage.ApplicationBar>
 
 </phone:PhoneApplicationPage>

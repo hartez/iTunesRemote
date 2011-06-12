@@ -13,6 +13,7 @@
 */
 
 using GalaSoft.MvvmLight;
+using iTunesRemote.WindowsPhone.Service;
 
 namespace iTunesRemote.WindowsPhone.ViewModel
 {
@@ -29,16 +30,18 @@ namespace iTunesRemote.WindowsPhone.ViewModel
         /// </summary>
         public ViewModelLocator()
         {
-            ////if (ViewModelBase.IsInDesignModeStatic)
-            ////{
-            ////    // Create design time services and viewmodels
-            ////}
-            ////else
-            ////{
-            ////    // Create run time services and view models
-            ////}
+			if (ViewModelBase.IsInDesignModeStatic)
+			{
+				// Create design time services and viewmodels
+				_main = new LibraryViewModel(null);
+			}
+			else
+			{
+				// Create run time services and view models
+				var model = new iTunesService("http://localhost:8080/");
 
-            _main = new LibraryViewModel();
+				_main = new LibraryViewModel(model);
+			}
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-﻿namespace iTunesRemote.Agent
+﻿namespace iTunesModel
 {
 	public class iTunesCommandResult
 	{

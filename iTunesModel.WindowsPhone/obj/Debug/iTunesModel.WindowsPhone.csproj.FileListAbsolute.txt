@@ -1,0 +1,5 @@
+C:\Users\hartez\Documents\Visual Studio 2010\Projects\iTunesRemote\iTunesModel.WindowsPhone\Bin\Debug\iTunesModel.WindowsPhone.dll
+C:\Users\hartez\Documents\Visual Studio 2010\Projects\iTunesRemote\iTunesModel.WindowsPhone\Bin\Debug\iTunesModel.WindowsPhone.pdb
+C:\Users\hartez\Documents\Visual Studio 2010\Projects\iTunesRemote\iTunesModel.WindowsPhone\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\hartez\Documents\Visual Studio 2010\Projects\iTunesRemote\iTunesModel.WindowsPhone\obj\Debug\iTunesModel.WindowsPhone.dll
+C:\Users\hartez\Documents\Visual Studio 2010\Projects\iTunesRemote\iTunesModel.WindowsPhone\obj\Debug\iTunesModel.WindowsPhone.pdb

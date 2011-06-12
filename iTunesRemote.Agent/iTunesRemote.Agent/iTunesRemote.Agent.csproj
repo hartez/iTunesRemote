@@ -73,9 +73,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Command.cs" />
-    <Compile Include="iTunesCommandResult.cs" />
     <Compile Include="iTunesModule.cs" />
-    <Compile Include="iTunesPlaylist.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -122,6 +120,12 @@
     <Content Include="remote.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\iTunesModel.Windows\iTunesModel.Windows.csproj">
+      <Project>{30B372D2-7D41-4BA0-AF91-55C791F7ECE1}</Project>
+      <Name>iTunesModel.Windows</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

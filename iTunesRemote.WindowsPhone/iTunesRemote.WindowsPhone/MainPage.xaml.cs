@@ -1,111 +1,50 @@
 ﻿using System;
-using System.IO;
-using System.Net;
-using System.Windows;
+using iTunesRemote.WindowsPhone.ViewModel;
 using Microsoft.Phone.Controls;
-using Newtonsoft.Json;
+using Microsoft.Phone.Shell;
 
 namespace iTunesRemote.WindowsPhone
 {
-    public partial class MainPage : PhoneApplicationPage
-    {
-        private string _baseUri = "http://192.168.1.12:8081/";
-		//private string _baseUri = "http://localhost:8080/";
-        private WebRequest _request;
+	public partial class MainPage : PhoneApplicationPage
+	{
+		private readonly ApplicationBarIconButton NextButton;
+		private readonly ApplicationBarIconButton PlayPauseButton;
+		private readonly ApplicationBarIconButton PreviousButton;
 
-        // Constructor
-        public MainPage()
-        {
-            InitializeComponent();
-            RetrieveCurrentTrack();
-        }
+		private LibraryViewModel _viewModel;
 
-        private void GetResource(string resource, OpenReadCompletedEventHandler handler)
-        {
-            try
-            {
-                var wc = new WebClient();
-                wc.OpenReadCompleted += handler;
-                wc.OpenReadAsync(new Uri(_baseUri + resource));
-            }
-            catch (WebException ex)
-            {
-                MessageBox.Show("Error connecting to service: " + ex.Message, "Error",
-                                MessageBoxButton.OK);
-            }
-        }
+		// Constructor
+		public MainPage()
+		{
+			InitializeComponent();
 
-        private void PostToResource(string resource, AsyncCallback callback)
-        {
-            try
-            {
-                _request = WebRequest.Create(_baseUri + resource);
+			PreviousButton = (ApplicationBarIconButton) ApplicationBar.Buttons[0];
+			PlayPauseButton = (ApplicationBarIconButton) ApplicationBar.Buttons[1];
+			NextButton = (ApplicationBarIconButton) ApplicationBar.Buttons[2];
 
-                _request.Method = "POST";
+			PreviousButton.Click += PreviousButton_Click;
+			PlayPauseButton.Click += PlayPauseButton_Click;
+			NextButton.Click += NextButton_Click;
+		}
 
-                _request.BeginGetResponse(callback, null);
-            }
-            catch (WebException ex)
-            {
-                MessageBox.Show("Error connecting to service: " + ex.Message, "Error",
-                                MessageBoxButton.OK);
-            }
-        }
+		private LibraryViewModel ViewModel
+		{
+			get { return _viewModel ?? (_viewModel = (LibraryViewModel) DataContext); }
+		}
 
-        private void RetrieveCurrentTrack()
-        {
-            GetResource("currentTrack", CurrentTrackOpenReadCompleted);
-        }
+		private void NextButton_Click(object sender, EventArgs e)
+		{
+			ViewModel.NextTrackCommand.Execute(null);
+		}
 
-        void CurrentTrackOpenReadCompleted(object sender, OpenReadCompletedEventArgs e)
-        {
-            try
-            {
-                // Look into userstate property - see if you can centralize webexception error handling
+		private void PlayPauseButton_Click(object sender, EventArgs e)
+		{
+			ViewModel.PlayPauseCommand.Execute(null);
+		}
 
-                var jsonSerializer = new JsonSerializer();
-                var jtr = new JsonTextReader(new StreamReader(e.Result));
-                var currentTrack = jsonSerializer.Deserialize<string>(jtr);
-
-                CurrentTrack.Text = currentTrack;
-            }
-            catch (WebException ex)
-            {
-                MessageBox.Show("Error connecting to service: " + ex.Message, "Error",
-                                MessageBoxButton.OK);
-            }
-        }
-
-        private void PlayPauseButtonClick(object sender, RoutedEventArgs e)
-        {
-            PostToResource("command/PlayPause", CommandIssued);
-        }
-
-        private void CommandIssued(IAsyncResult result)
-        {
-            var response = _request.EndGetResponse(result);
-
-            using(var reader = new StreamReader(response.GetResponseStream()))
-            {
-                var jsonSerializer = new JsonSerializer();
-                var jtr = new JsonTextReader(reader);
-                var commandResult = jsonSerializer.Deserialize<iTunesCommandResult>(jtr);
-
-                if (commandResult.Success)
-                {
-                    Dispatcher.BeginInvoke(() => { CurrentTrack.Text = commandResult.CurrentTrack; });
-                }
-            }
-        }
-
-        private void NextButtonClick(object sender, RoutedEventArgs e)
-        {
-            PostToResource("command/Next", CommandIssued);
-        }
-
-        private void PreviousButtonClick(object sender, RoutedEventArgs e)
-        {
-            PostToResource("command/Previous", CommandIssued);
-        }
-    }
+		private void PreviousButton_Click(object sender, EventArgs e)
+		{
+			ViewModel.PreviousTrackCommand.Execute(null);
+		}
+	}
 }

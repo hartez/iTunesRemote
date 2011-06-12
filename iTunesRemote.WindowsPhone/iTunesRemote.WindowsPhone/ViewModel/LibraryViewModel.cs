@@ -1,75 +1,116 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Net;
 using GalaSoft.MvvmLight;
-using Microsoft.Phone.Reactive;
-using Newtonsoft.Json;
+using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
+using iTunesModel;
+using iTunesRemote.WindowsPhone.Service;
 
 namespace iTunesRemote.WindowsPhone.ViewModel
 {
-    /// <summary>
-    ///   This class contains properties that the main View can data bind to.
-    ///   <para>
-    ///     Use the <strong>mvvminpc</strong> snippet to add bindable properties to this ViewModel.
-    ///   </para>
-    ///   <para>
-    ///     You can also use Blend to data bind with the tool's support.
-    ///   </para>
-    ///   <para>
-    ///     See http://www.galasoft.ch/mvvm
-    ///   </para>
-    /// </summary>
     public class LibraryViewModel : ViewModelBase
     {
-        private readonly ObservableCollection<iTunesPlaylist> _playlists = new ObservableCollection<iTunesPlaylist>();
+		private iTunesService TunesModel { get; set; }
+
+		public ObservableCollection<iTunesPlaylist> Playlists { get; set; }
+
+		/// <summary>
+		/// The <see cref="CurrentTrack" /> property's name.
+		/// </summary>
+		public const string CurrentTrackPropertyName = "CurrentTrack";
+
+		private String _currentTrack = String.Empty;
+
+		/// <summary>
+		/// Gets the CurrentTrack property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		public String CurrentTrack
+		{
+			get
+			{
+				if(!String.IsNullOrEmpty(_currentTrack))
+				{
+					return _currentTrack;
+				}
+
+				return String.Empty;
+			}
+
+			set
+			{
+				if (_currentTrack == value)
+				{
+					return;
+				}
+
+				_currentTrack = value;
+
+				// Update bindings, no broadcast
+				RaisePropertyChanged(CurrentTrackPropertyName);
+			}
+		}
 
         /// <summary>
         ///   Initializes a new instance of the MainViewModel class.
         /// </summary>
-        public LibraryViewModel()
+        public LibraryViewModel(iTunesService iTunesModel)
         {
-            if (IsInDesignMode)
-            {
-                Playlists.Add(new iTunesPlaylist(1, "Test"));
-                Playlists.Add(new iTunesPlaylist(2, "Test2"));
+        	TunesModel = iTunesModel;
+        	if (IsInDesignMode)
+        	{
+        		var blendPlaylist = new iTunesPlaylist(3, "Blend Playlist");
+				blendPlaylist.Tracks.Add(new Track("Dancing Queen"));
+				blendPlaylist.Tracks.Add(new Track("The Humpty Dance"));
+				blendPlaylist.Tracks.Add(new Track("Birdhouse In Your Soul"));
+
+				Playlists = new ObservableCollection<iTunesPlaylist>
+					{
+						blendPlaylist,
+						new iTunesPlaylist(1, "Test"),
+						new iTunesPlaylist(2, "Test2")
+					};
+
+            	_currentTrack = "Blister in the Sun";
             }
             else
             {
-                //LoadPlaylists();
+				Playlists = new ObservableCollection<iTunesPlaylist>();
+            	SynchronizePlaylists();
+				_currentTrack = TunesModel.CurrentTrack;
+
+				TunesModel.PropertyChanged += TunesModelPropertyChanged;
+
+				NextTrackCommand = new RelayCommand(() => TunesModel.NextTrack());
+				PreviousTrackCommand = new RelayCommand(() => TunesModel.PreviousTrack());
+				PlayPauseCommand = new RelayCommand(() => TunesModel.PlayPause());
             }
         }
 
-        public ObservableCollection<iTunesPlaylist> Playlists
-        {
-            get { return _playlists; }
-        }
+		private void SynchronizePlaylists()
+		{
+			Playlists.Clear();
 
-        private string _baseUri = "http://192.168.1.12:8081/";
+			foreach (var playList in TunesModel.Playlists)
+			{
+				Playlists.Add(playList);
+			}
+		}
 
-        private void LoadPlaylists()
-        {
-            var wc = new WebClient();
+    	void TunesModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		{
+			if(e.PropertyName == "CurrentTrack")
+			{
+				CurrentTrack = TunesModel.CurrentTrack;
+			}
+			else if(e.PropertyName == "Playlists")
+			{
+				SynchronizePlaylists();
+			}
+		}
 
-            var playlistObservable =
-                Observable.FromEvent<OpenReadCompletedEventArgs>(wc, "OpenReadCompleted").Take(1);
-
-            playlistObservable.Subscribe(p => ParsePlaylists(p.EventArgs));
-
-            wc.OpenReadAsync(new Uri(_baseUri + "Playlists"));
-        }
-
-        private void ParsePlaylists(OpenReadCompletedEventArgs e)
-        {
-            var jsonSerializer = new JsonSerializer();
-            var jtr = new JsonTextReader(new StreamReader(e.Result));
-            var playlists = jsonSerializer.Deserialize<List<iTunesPlaylist>>(jtr);
-
-            foreach (iTunesPlaylist iTunesPlaylist in playlists)
-            {
-                Playlists.Add(iTunesPlaylist);
-            }
-        }
+		public RelayCommand NextTrackCommand { get; private set; }
+		public RelayCommand PlayPauseCommand { get; private set; }
+		public RelayCommand PreviousTrackCommand { get; private set; }
     }
 }
