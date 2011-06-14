@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Windows;
 using iTunesRemote.WindowsPhone.ViewModel;
 using Microsoft.Phone.Controls;
+using Microsoft.Phone.Reactive;
 using Microsoft.Phone.Shell;
 
 namespace iTunesRemote.WindowsPhone
@@ -22,9 +24,44 @@ namespace iTunesRemote.WindowsPhone
 			PlayPauseButton = (ApplicationBarIconButton) ApplicationBar.Buttons[1];
 			NextButton = (ApplicationBarIconButton) ApplicationBar.Buttons[2];
 
-			PreviousButton.Click += PreviousButton_Click;
+			// Start observing the click events
+			var prevButtonClicks = Observable.FromEvent<EventArgs>(PreviousButton, "Click");
+			var nextButtonClicks = Observable.FromEvent<EventArgs>(NextButton, "Click");
+
+			// Create a observation of clicking any number of times and then not clicking again for an interval
+			var prevButtonStop = prevButtonClicks.Throttle(TimeSpan.FromMilliseconds(2000));
+			var nextButtonStop = nextButtonClicks.Throttle(TimeSpan.FromMilliseconds(2000));
+
+			// Since we care about a "click and then stop clicking" scenario for both buttons,
+			// merge those events together
+			var stoppedClicking = prevButtonStop.Merge(nextButtonStop);
+			
+			// Now, if either of those sequences happens, stoppedClicking will return an event
+				
+			// While a button is being clicked, we want to keep track of how many times it was clicked
+			// We can do that with an Aggregate
+			var countPrevClicks = prevButtonClicks
+				.TakeUntil(stoppedClicking)
+				.Aggregate(0, (acc, ev) => acc - 1);
+
+			// Create an Aggregate for each one
+			var countNextClicks = nextButtonClicks
+						.TakeUntil(stoppedClicking)
+						.Aggregate(0, (acc, ev) => acc + 1);
+
+
+			// Now we want to run those counters in parallel and when the user stops clicking,
+			// we want to bring them together to see what the total number is; for that we can use
+			// ForkJoin. Our selector will ultimately return an integer sum of the number of clicks
+			// in either direction; when we subscribe to that result, we can use that value
+			countPrevClicks.ForkJoin(countNextClicks, (prev, next) => prev + next)
+				.Repeat()
+				.Subscribe(e => Dispatcher.BeginInvoke(() =>MessageBox.Show("Sum of clicks is " + e + " times")));
+
+
+			//PreviousButton.Click += PreviousButton_Click;
 			PlayPauseButton.Click += PlayPauseButton_Click;
-			NextButton.Click += NextButton_Click;
+			//NextButton.Click += NextButton_Click;
 		}
 
 		private LibraryViewModel ViewModel
