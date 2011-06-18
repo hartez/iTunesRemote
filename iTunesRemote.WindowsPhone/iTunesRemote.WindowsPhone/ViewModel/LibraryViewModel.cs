@@ -81,8 +81,8 @@ namespace iTunesRemote.WindowsPhone.ViewModel
 
 				TunesModel.PropertyChanged += TunesModelPropertyChanged;
 
-				NextTrackCommand = new RelayCommand(() => TunesModel.NextTrack());
-				PreviousTrackCommand = new RelayCommand(() => TunesModel.PreviousTrack());
+				NextTrackCommand = new RelayCommand<int>(tracks => TunesModel.NextTrack(tracks));
+				PreviousTrackCommand = new RelayCommand<int>(tracks => TunesModel.PreviousTrack(tracks));
 				PlayPauseCommand = new RelayCommand(() => TunesModel.PlayPause());
             }
         }
@@ -109,8 +109,8 @@ namespace iTunesRemote.WindowsPhone.ViewModel
 			}
 		}
 
-		public RelayCommand NextTrackCommand { get; private set; }
+		public RelayCommand<int> NextTrackCommand { get; private set; }
 		public RelayCommand PlayPauseCommand { get; private set; }
-		public RelayCommand PreviousTrackCommand { get; private set; }
+		public RelayCommand<int> PreviousTrackCommand { get; private set; }
     }
 }

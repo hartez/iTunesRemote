@@ -91,14 +91,14 @@ namespace iTunesRemote.WindowsPhone.Service
 			PostToResource("command/PlayPause");
 		}
 
-		public void NextTrack()
+		public void NextTrack(int tracks)
 		{
-			PostToResource("command/Next");
+			PostToResource(String.Format("command/Next/{0}", tracks));
 		}
 
-		public void PreviousTrack()
+		public void PreviousTrack(int tracks)
 		{
-			PostToResource("command/Previous");
+			PostToResource(String.Format("command/Previous/{0}", tracks));
 		}
 
 		private void PostToResource(string resource)

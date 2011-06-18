@@ -56,12 +56,10 @@ namespace iTunesRemote.WindowsPhone
 			// in either direction; when we subscribe to that result, we can use that value
 			countPrevClicks.ForkJoin(countNextClicks, (prev, next) => prev + next)
 				.Repeat()
-				.Subscribe(e => Dispatcher.BeginInvoke(() =>MessageBox.Show("Sum of clicks is " + e + " times")));
+				.Subscribe(e => Dispatcher.BeginInvoke(() => Jump(e)));
 
 
-			//PreviousButton.Click += PreviousButton_Click;
 			PlayPauseButton.Click += PlayPauseButton_Click;
-			//NextButton.Click += NextButton_Click;
 		}
 
 		private LibraryViewModel ViewModel
@@ -69,19 +67,21 @@ namespace iTunesRemote.WindowsPhone
 			get { return _viewModel ?? (_viewModel = (LibraryViewModel) DataContext); }
 		}
 
-		private void NextButton_Click(object sender, EventArgs e)
+		private void Jump(int tracks)
 		{
-			ViewModel.NextTrackCommand.Execute(null);
+			if(tracks < 0)
+			{
+				ViewModel.PreviousTrackCommand.Execute(tracks * -1);
+			}
+			else if(tracks > 0)
+			{
+				ViewModel.NextTrackCommand.Execute(tracks);
+			}
 		}
 
 		private void PlayPauseButton_Click(object sender, EventArgs e)
 		{
 			ViewModel.PlayPauseCommand.Execute(null);
-		}
-
-		private void PreviousButton_Click(object sender, EventArgs e)
-		{
-			ViewModel.PreviousTrackCommand.Execute(null);
 		}
 	}
 }

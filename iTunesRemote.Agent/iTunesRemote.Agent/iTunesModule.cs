@@ -65,16 +65,24 @@ namespace iTunesRemote.Agent
 					return 404;
 				};
 
-			Post["/command/{command}"] = parameters =>
+			Post["/command/{command}/{tracks}"] = parameters =>
 				{
 					String command = parameters.command;
+					int? tracks = parameters.tracks;
 
 					Debug.WriteLine("Request: " + Request.Uri);
 					Debug.WriteLine("Request to execute command " + command);
 
+					if(tracks.HasValue)
+					{
+						Debug.WriteLine(string.Format("By {0} tracks", tracks));
+					}
+
 					var cmd = (Command)Enum.Parse(typeof (Command), command);
 
 					var result = new iTunesCommandResult();
+
+					int distance = tracks.HasValue ? tracks.Value : 1;
 
 					switch (cmd)
 					{
@@ -83,11 +91,21 @@ namespace iTunesRemote.Agent
 							result.Success = true;
 							break;
 						case Command.Next:
-							iTunes.NextTrack();
+
+							for (int n = 0; n < distance; n++)
+							{
+								iTunes.NextTrack();	
+							}
+
 							result.Success = true;
 							break;
 						case Command.Previous:
-							iTunes.PreviousTrack();
+							
+							for (int n = 0; n < distance; n++)
+							{
+								iTunes.PreviousTrack();
+							}
+							
 							result.Success = true;
 							break;
 						default:
