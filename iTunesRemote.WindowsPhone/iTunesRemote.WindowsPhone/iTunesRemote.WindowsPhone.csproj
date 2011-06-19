@@ -48,6 +48,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EZLibrary.WindowsPhone">
+      <HintPath>..\lib\EZLibrary.WindowsPhone.dll</HintPath>
+    </Reference>
     <Reference Include="GalaSoft.MvvmLight.Extras.WP7">
       <HintPath>..\packages\MvvmLight.3.0.2\lib\sl3-wp\GalaSoft.MvvmLight.Extras.WP7.dll</HintPath>
     </Reference>
@@ -56,6 +59,9 @@
     </Reference>
     <Reference Include="Microsoft.Phone" />
     <Reference Include="Microsoft.Phone.Controls, Version=7.0.0.0, Culture=neutral, PublicKeyToken=24eec0d8c86cda1e, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Phone.Controls.Toolkit">
+      <HintPath>..\..\packages\SilverlightToolkitWP.4.2011.2.1\lib\sl4\Microsoft.Phone.Controls.Toolkit.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Phone.Interop" />
     <Reference Include="Microsoft.Phone.Reactive" />
     <Reference Include="Newtonsoft.Json.WindowsPhone">
@@ -112,7 +118,10 @@
     <Content Include="Buttons\pause.png" />
     <Content Include="Buttons\play.png" />
     <Content Include="Buttons\rew.png" />
+    <Content Include="README_FIRST.txt" />
     <Content Include="SplashScreenImage.jpg" />
+    <Resource Include="Toolkit.Content\ApplicationBar.Cancel.png" />
+    <Resource Include="Toolkit.Content\ApplicationBar.Check.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\iTunesModel.WindowsPhone\iTunesModel.WindowsPhone.csproj">

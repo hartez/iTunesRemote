@@ -11,25 +11,6 @@ namespace iTunesRemote.Agent
 	{
 		private iTunesApp _itunes;
 
-		private List<string> ListTrackNames(IITPlaylist playlist)
-		{
-			var results = new List<string>();
-
-			for (int n = 1; n <= playlist.Tracks.Count; n++)
-			{
-				results.Add(playlist.Tracks[n].Name);
-			}
-
-			return results;
-		}
-
-		private IITPlaylist GetPlaylist(string name)
-		{
-			IITPlaylistCollection playlistCollection = iTunes.LibrarySource.Playlists;
-
-			return playlistCollection.ItemByName[name];
-		}
-
 		public iTunesModule()
 		{
 			Get["/currentTrack"] = parameters =>
@@ -56,13 +37,46 @@ namespace iTunesRemote.Agent
 					Debug.WriteLine("Request for tracks in playlist " + name);
 
 					IITPlaylist playlist = GetPlaylist(name);
-					
+
 					if (playlist != null)
 					{
-						return Response.AsJson(ListTrackNames(playlist));
+						return Response.AsJson(ListTracks(playlist));
 					}
 
 					return 404;
+				};
+
+			Post["/command/play/{playlist}/{low}/{high}"] = parameters =>
+				{
+					string playlist = parameters.playlist;
+					int low = parameters.low;
+					int high = parameters.high;
+					var result = new iTunesCommandResult();
+
+					IITTrack newTrack = GetPlaylist(playlist).Tracks.ItemByPersistentID[high, low];
+
+					if (newTrack != null && newTrack.Enabled)
+					{
+						newTrack.Play();
+
+						result.CurrentTrack = newTrack.Name;
+					}
+
+					result.Success = true;
+
+					return Response.AsJson(result);
+				};
+
+			Post["/command/PlayPause"] = parameters =>
+				{
+					iTunes.PlayPause();
+
+					var result = new iTunesCommandResult();
+
+					result.Success = true;
+					result.CurrentTrack = CurrentTrack;
+
+					return Response.AsJson(result);
 				};
 
 			Post["/command/{command}/{tracks}"] = parameters =>
@@ -73,12 +87,12 @@ namespace iTunesRemote.Agent
 					Debug.WriteLine("Request: " + Request.Uri);
 					Debug.WriteLine("Request to execute command " + command);
 
-					if(tracks.HasValue)
+					if (tracks.HasValue)
 					{
 						Debug.WriteLine(string.Format("By {0} tracks", tracks));
 					}
 
-					var cmd = (Command)Enum.Parse(typeof (Command), command);
+					var cmd = (Command) Enum.Parse(typeof (Command), command);
 
 					var result = new iTunesCommandResult();
 
@@ -86,26 +100,22 @@ namespace iTunesRemote.Agent
 
 					switch (cmd)
 					{
-						case Command.PlayPause:
-							iTunes.PlayPause();
-							result.Success = true;
-							break;
 						case Command.Next:
 
 							for (int n = 0; n < distance; n++)
 							{
-								iTunes.NextTrack();	
+								iTunes.NextTrack();
 							}
 
 							result.Success = true;
 							break;
 						case Command.Previous:
-							
+
 							for (int n = 0; n < distance; n++)
 							{
 								iTunes.PreviousTrack();
 							}
-							
+
 							result.Success = true;
 							break;
 						default:
@@ -138,6 +148,33 @@ namespace iTunesRemote.Agent
 			}
 		}
 
+		private List<Track> ListTracks(IITPlaylist playlist)
+		{
+			var results = new List<Track>();
+
+			for (int n = 1; n <= playlist.Tracks.Count; n++)
+			{
+				if (playlist.Tracks[n].Enabled)
+				{
+					int low;
+					int high;
+					object iObject = playlist.Tracks[n];
+					iTunes.GetITObjectPersistentIDs(ref iObject, out high, out low);
+
+					results.Add(new Track(playlist.Tracks[n].Name, low, high));
+				}
+			}
+
+			return results;
+		}
+
+		private IITPlaylist GetPlaylist(string name)
+		{
+			IITPlaylistCollection playlistCollection = iTunes.LibrarySource.Playlists;
+
+			return playlistCollection.ItemByName[name];
+		}
+
 		private List<iTunesPlaylist> ListPlaylists()
 		{
 			var result = new List<iTunesPlaylist>();
@@ -147,12 +184,20 @@ namespace iTunesRemote.Agent
 			{
 				var playlist = new iTunesPlaylist(playlists[n].playlistID, playlists[n].Name);
 
-				for(int t = 1; t < playlists[n].Tracks.Count; t++)
+				if (playlist.Name != "Library")
 				{
-					playlist.Tracks.Add(new Track(playlists[n].Tracks[t].Name));
-				}
+					for (int t = 1; t < playlists[n].Tracks.Count; t++)
+					{
+						int low;
+						int high;
+						object iObject = playlists[n].Tracks[t];
+						iTunes.GetITObjectPersistentIDs(ref iObject, out high, out low);
 
-				result.Add(playlist);
+						playlist.Tracks.Add(new Track(playlists[n].Tracks[t].Name, low, high));
+					}
+
+					result.Add(playlist);
+				}
 			}
 
 			return result;

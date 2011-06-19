@@ -54,6 +54,9 @@
     <Compile Include="..\iTunesModel.Windows\iTunesPlaylist.cs">
       <Link>iTunesPlaylist.cs</Link>
     </Compile>
+    <Compile Include="..\iTunesModel.Windows\Track.cs">
+      <Link>Track.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />

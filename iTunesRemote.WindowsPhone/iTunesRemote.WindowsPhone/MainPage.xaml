@@ -5,17 +5,20 @@
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls" mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls" 
+	xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" 
+	xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WP7" 
+	xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit" 
+	xmlns:Interactivity="clr-namespace:EZLibrary.WindowsPhone.Interactivity;assembly=EZLibrary.WindowsPhone"
+	mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait" Orientation="Portrait"
     shell:SystemTray.IsVisible="True"
-	DataContext="{Binding Library, Source={StaticResource Locator}}">
-	<phone:PhoneApplicationPage.Resources>
+	DataContext="{Binding Library, Source={StaticResource Locator}}" x:Name="ThisPage">
 	
-	</phone:PhoneApplicationPage.Resources>
-
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <Grid.RowDefinitions>
@@ -34,7 +37,9 @@
 
 			<controls:Pivot Title="Playlists"
 							x:Name="LibraryPivot"
-							ItemsSource="{Binding Playlists}">
+							ItemsSource="{Binding Playlists}"
+							SelectedItem="{Binding SelectedPlayList, Mode=TwoWay}">
+
 				<controls:Pivot.HeaderTemplate>
 					<DataTemplate>
 						<TextBlock Text="{Binding Name}" />
@@ -43,19 +48,37 @@
 				<controls:Pivot.ItemTemplate>
 					<DataTemplate>
 
-						<ListBox ItemsSource="{Binding Tracks}">
+						<ListBox ItemsSource="{Binding Tracks}" 
+								 SelectedItem="{Binding SelectedTrack, Mode=TwoWay}">
 							<ListBox.ItemTemplate>
 								<DataTemplate>
 									<TextBlock Text="{Binding Name}"></TextBlock>
 								</DataTemplate>
 							</ListBox.ItemTemplate>
+
+							<toolkit:GestureService.GestureListener>
+								<toolkit:GestureListener></toolkit:GestureListener>
+							</toolkit:GestureService.GestureListener>
+
+							<i:Interaction.Behaviors>
+								<Interactivity:GestureBehavior />
+							</i:Interaction.Behaviors>
+
+							<i:Interaction.Triggers>
+								<Interactivity:DoubleTapTrigger>
+									<cmd:EventToCommand IsEnabled="True"
+														Command="{Binding Source={StaticResource Locator}, Path=Library.PlayTrackCommand}" />
+								</Interactivity:DoubleTapTrigger>
+							</i:Interaction.Triggers>
+							
 						</ListBox>
 
 					</DataTemplate>
 				</controls:Pivot.ItemTemplate>
-			</controls:Pivot>
 
-	    </Grid>
+			</controls:Pivot>
+		
+		</Grid>
     </Grid>
  
     <phone:PhoneApplicationPage.ApplicationBar>

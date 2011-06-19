@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 
 namespace iTunesModel 
 {
-	public class iTunesPlaylist
+	public class iTunesPlaylist : INotifyPropertyChanged
 	{
 		public iTunesPlaylist(int id, string name)
 		{
@@ -15,15 +18,41 @@ namespace iTunesModel
 		public string Name { get; set; }
 
 		public List<Track> Tracks { get; set; }
-	}
 
-	public class Track
-	{
-		public Track(string name)
+		private Track _selectedTrack = null;
+
+		/// <summary>
+		/// Gets the SelectedTrack property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		public Track SelectedTrack
 		{
-			Name = name;
+			get { return _selectedTrack; }
+
+			set
+			{
+				if (_selectedTrack == value)
+				{
+					return;
+				}
+
+				_selectedTrack = value;
+
+				Debug.WriteLine(string.Format("Selected Track changed to {0}", SelectedTrack.Name));
+
+				InvokePropertyChanged(new PropertyChangedEventArgs("SelectedTrack"));
+			}
 		}
 
-		public string Name { get; set; }
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		public void InvokePropertyChanged(PropertyChangedEventArgs e)
+		{
+			PropertyChangedEventHandler handler = PropertyChanged;
+			if (handler != null)
+			{
+				handler(this, e);
+			}
+		}
 	}
 }
