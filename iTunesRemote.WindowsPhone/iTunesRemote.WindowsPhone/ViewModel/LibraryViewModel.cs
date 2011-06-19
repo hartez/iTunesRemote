@@ -57,8 +57,6 @@ namespace iTunesRemote.WindowsPhone.ViewModel
     	/// </summary>
     	public const string SelectedTrackPropertyName = "SelectedTrack";
 
-    
-
     	/// <summary>
     	/// The <see cref="SelectedPlayList" /> property's name.
     	/// </summary>

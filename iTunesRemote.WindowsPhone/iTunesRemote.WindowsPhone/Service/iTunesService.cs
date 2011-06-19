@@ -83,12 +83,12 @@ namespace iTunesRemote.WindowsPhone.Service
 				{
 					var jsonSerializer = new JsonSerializer();
 					var jtr = new JsonTextReader(new StreamReader(p.EventArgs.Result));
-					var currentTrack = jsonSerializer.Deserialize<string>(jtr);
+					var status = jsonSerializer.Deserialize<iTunesStatus>(jtr);
 
-					CurrentTrack = currentTrack;
+					CurrentTrack = status.CurrentTrack;
 				});
 
-			wc.OpenReadAsync(new Uri(_baseUri + "currentTrack"));
+			wc.OpenReadAsync(new Uri(_baseUri + "status"));
 		}
 
 		public void PlayPause()
@@ -122,7 +122,7 @@ namespace iTunesRemote.WindowsPhone.Service
 
 					if (commandResult.Success)
 					{
-						CurrentTrack = commandResult.CurrentTrack;
+						CurrentTrack = commandResult.Status.CurrentTrack;
 					}
 				});
 

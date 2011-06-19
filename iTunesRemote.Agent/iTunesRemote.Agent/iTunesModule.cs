@@ -13,12 +13,12 @@ namespace iTunesRemote.Agent
 
 		public iTunesModule()
 		{
-			Get["/currentTrack"] = parameters =>
+			Get["/status"] = parameters =>
 				{
 					Debug.WriteLine("Request: " + Request.Uri);
 					Debug.WriteLine("Request for current track");
 
-					return Response.AsJson(CurrentTrack);
+					return Response.AsJson(Status);
 				};
 
 			Get["/playlists"] = parameters =>
@@ -59,7 +59,8 @@ namespace iTunesRemote.Agent
 					{
 						newTrack.Play();
 
-						result.CurrentTrack = newTrack.Name;
+						result.Status.SecondsRemaining = newTrack.Duration - iTunes.PlayerPosition; 
+						result.Status.CurrentTrack = newTrack.Name;
 					}
 
 					result.Success = true;
@@ -74,7 +75,7 @@ namespace iTunesRemote.Agent
 					var result = new iTunesCommandResult();
 
 					result.Success = true;
-					result.CurrentTrack = CurrentTrack;
+					result.Status = Status;
 
 					return Response.AsJson(result);
 				};
@@ -92,47 +93,49 @@ namespace iTunesRemote.Agent
 						Debug.WriteLine(string.Format("By {0} tracks", tracks));
 					}
 
-					var cmd = (Command) Enum.Parse(typeof (Command), command);
-
 					var result = new iTunesCommandResult();
 
 					int distance = tracks.HasValue ? tracks.Value : 1;
 
-					switch (cmd)
+
+					if (command == "Next")
 					{
-						case Command.Next:
+						for (int n = 0; n < distance; n++)
+						{
+							iTunes.NextTrack();
+						}
 
-							for (int n = 0; n < distance; n++)
-							{
-								iTunes.NextTrack();
-							}
+						result.Success = true;
+					}
+					else if (command == "Previous")
+					{
+						for (int n = 0; n < distance; n++)
+						{
+							iTunes.PreviousTrack();
+						}
 
-							result.Success = true;
-							break;
-						case Command.Previous:
-
-							for (int n = 0; n < distance; n++)
-							{
-								iTunes.PreviousTrack();
-							}
-
-							result.Success = true;
-							break;
-						default:
-							result.Success = false;
-							result.ErrorMessage = "Not a valid command";
-							break;
+						result.Success = true;
 					}
 
-					result.CurrentTrack = CurrentTrack;
+					result.Status = Status;
 
 					return Response.AsJson(result);
 				};
 		}
 
-		public string CurrentTrack
+		public iTunesStatus Status
 		{
-			get { return iTunes.CurrentTrack != null ? iTunes.CurrentTrack.Name : "None"; }
+			get
+			{
+				var status = new iTunesStatus();
+				status.CurrentTrack = iTunes.CurrentTrack != null ? iTunes.CurrentTrack.Name : "None";
+				if (iTunes.CurrentTrack != null)
+				{
+					status.SecondsRemaining = iTunes.CurrentTrack.Duration - iTunes.PlayerPosition;
+				}
+				status.Playing = iTunes.PlayerState == ITPlayerState.ITPlayerStatePlaying;
+				return status;
+			}
 		}
 
 		private iTunesApp iTunes
