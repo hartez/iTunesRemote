@@ -10,3 +10,12 @@ iTunesRemote.WindowsPhone/iTunesRemote.WindowsPhone/*.user
 packages.config
 
 iTunesRemote.WindowsPhone/lib/Newtonsoft.Json.WindowsPhone.pdb
+iTunesModel.Windows/obj/Debug/*
+iTunesModel.Windows/obj/*
+iTunesModel.Windows/bin/*
+iTunesModel.WindowsPhone/obj/*
+iTunesModel.WindowsPhone/obj/*
+iTunesModel.Windows/bin/*
+iTunesModel.Windows/obj/*
+iTunesModel.Windows/bin/*
+iTunesModel.Windows/bin/*
