@@ -23,7 +23,7 @@ namespace iTunesRemote.WindowsPhone.ViewModel
     /// </summary>
     public class ViewModelLocator
     {
-        private static LibraryViewModel _main;
+        private static MainViewModel _main;
 
         /// <summary>
         /// Initializes a new instance of the ViewModelLocator class.
@@ -33,14 +33,14 @@ namespace iTunesRemote.WindowsPhone.ViewModel
 			if (ViewModelBase.IsInDesignModeStatic)
 			{
 				// Create design time services and viewmodels
-				_main = new LibraryViewModel(null);
+				_main = new MainViewModel(null);
 			}
 			else
 			{
 				// Create run time services and view models
 				var model = new iTunesService("http://localhost:8080/");
 
-				_main = new LibraryViewModel(model);
+				_main = new MainViewModel(model);
 			}
         }
 
@@ -50,7 +50,7 @@ namespace iTunesRemote.WindowsPhone.ViewModel
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance",
             "CA1822:MarkMembersAsStatic",
             Justification = "This non-static member is needed for data binding purposes.")]
-        public LibraryViewModel Library
+        public MainViewModel Library
         {
             get
             {

@@ -9,7 +9,7 @@ using iTunesRemote.WindowsPhone.Service;
 
 namespace iTunesRemote.WindowsPhone.ViewModel
 {
-    public class LibraryViewModel : ViewModelBase
+    public class MainViewModel : ViewModelBase
     {
 		private iTunesService iTunesService { get; set; }
 
@@ -45,10 +45,11 @@ namespace iTunesRemote.WindowsPhone.ViewModel
 					return;
 				}
 
+				var oldValue = _currentTrack;
 				_currentTrack = value;
 
 				// Update bindings, no broadcast
-				RaisePropertyChanged(CurrentTrackPropertyName);
+				RaisePropertyChanged(CurrentTrackPropertyName, oldValue, value, true);
 			}
 		}
 
@@ -90,7 +91,7 @@ namespace iTunesRemote.WindowsPhone.ViewModel
         /// <summary>
         ///   Initializes a new instance of the MainViewModel class.
         /// </summary>
-        public LibraryViewModel(iTunesService iTunesModel)
+        public MainViewModel(iTunesService iTunesModel)
         {
         	iTunesService = iTunesModel;
         	if (IsInDesignMode)
@@ -113,9 +114,9 @@ namespace iTunesRemote.WindowsPhone.ViewModel
             {
 				Playlists = new ObservableCollection<iTunesPlaylist>();
             	SynchronizePlaylists();
-				_currentTrack = iTunesService.CurrentTrack;
+				_currentTrack = iTunesService.CurrentStatus.CurrentTrack;
 
-				iTunesService.PropertyChanged += TunesModelPropertyChanged;
+				iTunesService.PropertyChanged += TunesServicePropertyChanged;
 
 				NextTrackCommand = new RelayCommand<int>(tracks => iTunesService.NextTrack(tracks));
 				PreviousTrackCommand = new RelayCommand<int>(tracks => iTunesService.PreviousTrack(tracks));
@@ -143,11 +144,11 @@ namespace iTunesRemote.WindowsPhone.ViewModel
 			}
 		}
 
-    	void TunesModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		void TunesServicePropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
-			if(e.PropertyName == "CurrentTrack")
+			if(e.PropertyName == "CurrentStatus")
 			{
-				CurrentTrack = iTunesService.CurrentTrack;
+				CurrentTrack = iTunesService.CurrentStatus.CurrentTrack;
 			}
 			else if(e.PropertyName == "Playlists")
 			{

@@ -14,16 +14,16 @@ namespace iTunesRemote.WindowsPhone.Service
 	{
 		private readonly string _baseUri;
 		private readonly ObservableCollection<iTunesPlaylist> _playlists = new ObservableCollection<iTunesPlaylist>();
-		private String _currentTrack;
+		private iTunesStatus _currentTrack;
 
 		public iTunesService(string baseUri)
 		{
 			_baseUri = baseUri;
-			UpdateCurrentTrack();
+			UpdateCurrentStatus();
 			LoadPlaylists();
 		}
 
-		public string CurrentTrack
+		public iTunesStatus CurrentStatus
 		{
 			get { return _currentTrack; }
 			private set
@@ -72,7 +72,7 @@ namespace iTunesRemote.WindowsPhone.Service
 			InvokePropertyChanged(new PropertyChangedEventArgs("Playlists"));
 		}
 
-		private void UpdateCurrentTrack()
+		private void UpdateCurrentStatus()
 		{
 			var wc = new WebClient();
 
@@ -85,7 +85,7 @@ namespace iTunesRemote.WindowsPhone.Service
 					var jtr = new JsonTextReader(new StreamReader(p.EventArgs.Result));
 					var status = jsonSerializer.Deserialize<iTunesStatus>(jtr);
 
-					CurrentTrack = status.CurrentTrack;
+					CurrentStatus = status;
 				});
 
 			wc.OpenReadAsync(new Uri(_baseUri + "status"));
@@ -122,7 +122,7 @@ namespace iTunesRemote.WindowsPhone.Service
 
 					if (commandResult.Success)
 					{
-						CurrentTrack = commandResult.Status.CurrentTrack;
+						CurrentStatus = commandResult.Status;
 					}
 				});
 

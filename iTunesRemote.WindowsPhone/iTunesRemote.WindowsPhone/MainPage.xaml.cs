@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using GalaSoft.MvvmLight.Messaging;
 using iTunesRemote.WindowsPhone.ViewModel;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Reactive;
@@ -13,7 +14,7 @@ namespace iTunesRemote.WindowsPhone
 		private readonly ApplicationBarIconButton PlayPauseButton;
 		private readonly ApplicationBarIconButton PreviousButton;
 
-		private LibraryViewModel _viewModel;
+		private MainViewModel _viewModel;
 
 		// Constructor
 		public MainPage()
@@ -56,19 +57,28 @@ namespace iTunesRemote.WindowsPhone
 			// in either direction; when we subscribe to that result, we can use that value
 			countPrevClicks.ForkJoin(countNextClicks, (prev, next) => prev + next)
 				.Repeat()
-				.Subscribe(e => Dispatcher.BeginInvoke(() => Jump(e)));
-
+				.Subscribe(e => Dispatcher.BeginInvoke(() => Jump(e, false)));
 
 			PlayPauseButton.Click += PlayPauseButton_Click;
 		}
 
-		private LibraryViewModel ViewModel
+		private MainViewModel ViewModel
 		{
-			get { return _viewModel ?? (_viewModel = (LibraryViewModel) DataContext); }
+			get { return _viewModel ?? (_viewModel = (MainViewModel) DataContext); }
 		}
 
-		private void Jump(int tracks)
+		private void Jump(int tracks, bool togglePlay)
 		{
+			if(togglePlay)
+			{
+				Messenger.Default.Register<PropertyChangedMessage<string>>(
+					this, e =>
+						{
+							Messenger.Default.Unregister<PropertyChangedMessage<string>>(this);
+							ViewModel.PlayPauseCommand.Execute(null); 
+						});
+			}
+
 			if(tracks < 0)
 			{
 				ViewModel.PreviousTrackCommand.Execute(tracks * -1);
@@ -82,6 +92,15 @@ namespace iTunesRemote.WindowsPhone
 		private void PlayPauseButton_Click(object sender, EventArgs e)
 		{
 			ViewModel.PlayPauseCommand.Execute(null);
+
+			if (PlayPauseButton.IconUri == new Uri("/Buttons/play.png", UriKind.Relative))
+			{
+				PlayPauseButton.IconUri = new Uri("/Buttons/pause.png", UriKind.Relative);
+			}
+			else
+			{
+				PlayPauseButton.IconUri = new Uri("/Buttons/play.png", UriKind.Relative);
+			}
 		}
 	}
 }
