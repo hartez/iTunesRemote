@@ -13,18 +13,18 @@ namespace iTunesRemote.Agent
 
 		public iTunesModule()
 		{
-			Get["/status"] = parameters =>
+			Get["/currentstatus"] = parameters =>
 				{
-					Debug.WriteLine("Request: " + Request.Uri);
-					Debug.WriteLine("Request for current track");
+					Trace.WriteLine("Request: " + Request.Uri);
+					Trace.WriteLine("Request for current status");
 
 					return Response.AsJson(Status);
 				};
 
 			Get["/playlists"] = parameters =>
 				{
-					Debug.WriteLine("Request: " + Request.Uri);
-					Debug.WriteLine("Request for list of playlists");
+					Trace.WriteLine("Request: " + Request.Uri);
+					Trace.WriteLine("Request for list of playlists");
 
 					return Response.AsJson(ListPlaylists());
 				};
@@ -33,8 +33,8 @@ namespace iTunesRemote.Agent
 				{
 					String name = parameters.name;
 
-					Debug.WriteLine("Request: " + Request.Uri);
-					Debug.WriteLine("Request for tracks in playlist " + name);
+					Trace.WriteLine("Request: " + Request.Uri);
+					Trace.WriteLine("Request for tracks in playlist " + name);
 
 					IITPlaylist playlist = GetPlaylist(name);
 
@@ -85,12 +85,12 @@ namespace iTunesRemote.Agent
 					String command = parameters.command;
 					int? tracks = parameters.tracks;
 
-					Debug.WriteLine("Request: " + Request.Uri);
-					Debug.WriteLine("Request to execute command " + command);
+					Trace.WriteLine("Request: " + Request.Uri);
+					Trace.WriteLine("Request to execute command " + command);
 
 					if (tracks.HasValue)
 					{
-						Debug.WriteLine(string.Format("By {0} tracks", tracks));
+						Trace.WriteLine(string.Format("By {0} tracks", tracks));
 					}
 
 					var result = new iTunesCommandResult();

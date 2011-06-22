@@ -10,6 +10,8 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using GalaSoft.MvvmLight.Messaging;
+using iTunesRemote.WindowsPhone.ViewModel;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 
@@ -56,6 +58,7 @@ namespace iTunesRemote.WindowsPhone
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
+			Messenger.Default.Register<ErrorMessage>(this, msg => MessageBox.Show(msg.Error, "Error", MessageBoxButton.OK));
         }
 
         // Code to execute when the application is activated (brought to foreground)

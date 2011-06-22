@@ -38,7 +38,8 @@ namespace iTunesRemote.WindowsPhone.ViewModel
 			else
 			{
 				// Create run time services and view models
-				var model = new iTunesService("http://localhost:8080/");
+				var model = new iTunesService("http://192.168.1.12:8081/");
+				//var model = new iTunesService("http://localhost:8080/");
 
 				_main = new MainViewModel(model);
 			}

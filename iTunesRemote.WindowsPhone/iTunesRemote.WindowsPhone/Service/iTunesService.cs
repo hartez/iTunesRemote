@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
+using System.Windows;
 using iTunesModel;
 using Microsoft.Phone.Reactive;
 using Newtonsoft.Json;
@@ -14,22 +15,35 @@ namespace iTunesRemote.WindowsPhone.Service
 	{
 		private readonly string _baseUri;
 		private readonly ObservableCollection<iTunesPlaylist> _playlists = new ObservableCollection<iTunesPlaylist>();
-		private iTunesStatus _currentTrack;
+		private iTunesStatus _currentStatus;
+		private string _error;
 
 		public iTunesService(string baseUri)
 		{
 			_baseUri = baseUri;
+			CurrentStatus = new iTunesStatus();
+			CurrentStatus.CurrentTrack = "";
 			UpdateCurrentStatus();
 			LoadPlaylists();
 		}
 
 		public iTunesStatus CurrentStatus
 		{
-			get { return _currentTrack; }
+			get { return _currentStatus; }
 			private set
 			{
-				_currentTrack = value;
-				InvokePropertyChanged(new PropertyChangedEventArgs("CurrentTrack"));
+				_currentStatus = value;
+				InvokePropertyChanged(new PropertyChangedEventArgs("CurrentStatus"));
+			}
+		}
+
+		public String Error
+		{
+			get { return _error; }
+			set
+			{
+				_error = value;
+				InvokePropertyChanged(new PropertyChangedEventArgs("Error"));
 			}
 		}
 
@@ -47,11 +61,11 @@ namespace iTunesRemote.WindowsPhone.Service
 		private void LoadPlaylists()
 		{
 			var wc = new WebClient();
-
+			
 			IObservable<IEvent<OpenReadCompletedEventArgs>> playlistObservable =
 				Observable.FromEvent<OpenReadCompletedEventArgs>(wc, "OpenReadCompleted").Take(1);
 
-			playlistObservable.Subscribe(p => ParsePlaylists(p.EventArgs));
+			playlistObservable.Subscribe(p => ParsePlaylists(p.EventArgs), ex => { Error = ex.Message; });
 
 			wc.OpenReadAsync(new Uri(_baseUri + "Playlists"));
 		}
@@ -81,14 +95,21 @@ namespace iTunesRemote.WindowsPhone.Service
 
 			observable.Subscribe(p =>
 				{
+					
 					var jsonSerializer = new JsonSerializer();
 					var jtr = new JsonTextReader(new StreamReader(p.EventArgs.Result));
 					var status = jsonSerializer.Deserialize<iTunesStatus>(jtr);
 
 					CurrentStatus = status;
-				});
+				},
+			(ex) =>
+				{
+					Error = ex.Message;
+				}
 
-			wc.OpenReadAsync(new Uri(_baseUri + "status"));
+				);
+
+			wc.OpenReadAsync(new Uri(_baseUri + "currentstatus"));
 		}
 
 		public void PlayPause()
@@ -124,6 +145,10 @@ namespace iTunesRemote.WindowsPhone.Service
 					{
 						CurrentStatus = commandResult.Status;
 					}
+				},
+				(ex) =>
+				{
+					Error = ex.Message;
 				});
 
 			wc.UploadStringAsync(new Uri(_baseUri + resource), "POST", String.Empty);

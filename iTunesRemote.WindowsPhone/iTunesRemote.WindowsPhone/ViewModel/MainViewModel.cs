@@ -154,6 +154,13 @@ namespace iTunesRemote.WindowsPhone.ViewModel
 			{
 				SynchronizePlaylists();
 			}
+			else if(e.PropertyName == "Error")
+			{
+				if(!String.IsNullOrEmpty(iTunesService.Error))
+				{
+					Messenger.Default.Send(new ErrorMessage(iTunesService.Error));
+				}
+			}
 		}
 
 		public RelayCommand<int> NextTrackCommand { get; private set; }

@@ -85,13 +85,13 @@ namespace iTunesRemote.Agent
 			{
 				string endpoint = Settings.Default.endpoint;
 
-				Debug.Write("Starting up web service");
+				Trace.Write("Starting up web service");
 
 				_listener = new NancyHost(new Uri(endpoint));
 				
 				_listener.Start();
 
-				Debug.Write("Web service started");
+				Trace.Write("Web service started");
 			}
 			catch (Exception ex)
 			{
