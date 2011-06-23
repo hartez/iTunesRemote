@@ -30,11 +30,12 @@
         <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,17,0,28">
             <TextBlock x:Name="ApplicationTitle" Text="iTunes Remote" Style="{StaticResource PhoneTextNormalStyle}"/>
             <TextBlock x:Name="PageTitle" Text="{Binding CurrentTrack}" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}" FontSize="29.333"/>
+			<TextBlock Text="{Binding Remaining}"></TextBlock>
         </StackPanel>
 
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-
+			
 			<controls:Pivot Title="Playlists"
 							x:Name="LibraryPivot"
 							ItemsSource="{Binding Playlists}"

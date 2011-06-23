@@ -155,7 +155,7 @@ namespace iTunesRemote.Agent
 		{
 			var results = new List<Track>();
 
-			for (int n = 1; n <= playlist.Tracks.Count; n++)
+			for (int n = 1; n <= Math.Min(20, playlist.Tracks.Count); n++)
 			{
 				if (playlist.Tracks[n].Enabled)
 				{

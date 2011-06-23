@@ -60,6 +60,16 @@ namespace iTunesRemote.WindowsPhone
 				.Subscribe(e => Dispatcher.BeginInvoke(() => Jump(e, false)));
 
 			PlayPauseButton.Click += PlayPauseButton_Click;
+
+			Messenger.Default.Register<bool>(this,
+				(playing) =>
+				{
+					PlayPauseButton.IconUri = playing
+						? new Uri("/Buttons/pause.png", UriKind.Relative)
+						: new Uri("/Buttons/play.png", UriKind.Relative);
+				}
+
+				);
 		}
 
 		private MainViewModel ViewModel
@@ -92,15 +102,6 @@ namespace iTunesRemote.WindowsPhone
 		private void PlayPauseButton_Click(object sender, EventArgs e)
 		{
 			ViewModel.PlayPauseCommand.Execute(null);
-
-			if (PlayPauseButton.IconUri == new Uri("/Buttons/play.png", UriKind.Relative))
-			{
-				PlayPauseButton.IconUri = new Uri("/Buttons/pause.png", UriKind.Relative);
-			}
-			else
-			{
-				PlayPauseButton.IconUri = new Uri("/Buttons/play.png", UriKind.Relative);
-			}
 		}
 	}
 }

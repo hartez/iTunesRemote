@@ -6,6 +6,7 @@ using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using iTunesModel;
 using iTunesRemote.WindowsPhone.Service;
+using Microsoft.Phone.Reactive;
 
 namespace iTunesRemote.WindowsPhone.ViewModel
 {
@@ -14,6 +15,35 @@ namespace iTunesRemote.WindowsPhone.ViewModel
 		private iTunesService iTunesService { get; set; }
 
 		public ObservableCollection<iTunesPlaylist> Playlists { get; set; }
+
+		/// <summary>
+		/// The <see cref="Remaining" /> property's name.
+		/// </summary>
+		public const string RemainingPropertyName = "Remaining";
+
+		private string _remaining = "00:00";
+
+		/// <summary>
+		/// Gets the Remaining property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		public string Remaining
+		{
+			get { return _remaining; }
+
+			set
+			{
+				if (_remaining == value)
+				{
+					return;
+				}
+
+				_remaining = value;
+
+				// Update bindings, no broadcast
+				RaisePropertyChanged(RemainingPropertyName);
+			}
+		}
 
 		/// <summary>
 		/// The <see cref="CurrentTrack" /> property's name.
@@ -144,11 +174,46 @@ namespace iTunesRemote.WindowsPhone.ViewModel
 			}
 		}
 
+		private IDisposable _countdown;
+
+		private void StartCountDown(int secondsRemaining)
+		{
+			if (_countdown != null)
+			{
+				_countdown.Dispose();
+			}
+
+			if (secondsRemaining > 0
+				&& iTunesService.CurrentStatus.Playing)
+			{
+				var remaining = iTunesService.CurrentStatus.SecondsRemaining;
+
+				_countdown = Observable.Interval(TimeSpan.FromSeconds(1))
+					.TakeWhile(s => s < remaining)
+					.Select(x => TimeSpan.FromSeconds(remaining - x))
+					.ObserveOnDispatcher()
+					.Subscribe(
+						x => Remaining = x.ToString(),
+						() => iTunesService.UpdateCurrentStatus()
+					);
+			}
+			else
+			{
+				_countdown = Observable.Interval(TimeSpan.FromSeconds(10))
+					.Take(1)
+					.ObserveOnDispatcher()
+					.Subscribe(x => iTunesService.UpdateCurrentStatus());
+			}
+		}
+
 		void TunesServicePropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
 			if(e.PropertyName == "CurrentStatus")
 			{
 				CurrentTrack = iTunesService.CurrentStatus.CurrentTrack;
+				Messenger.Default.Send(iTunesService.CurrentStatus.Playing);
+
+				StartCountDown(iTunesService.CurrentStatus.SecondsRemaining);
 			}
 			else if(e.PropertyName == "Playlists")
 			{

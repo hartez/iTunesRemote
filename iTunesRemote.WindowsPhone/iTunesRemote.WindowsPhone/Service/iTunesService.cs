@@ -86,7 +86,7 @@ namespace iTunesRemote.WindowsPhone.Service
 			InvokePropertyChanged(new PropertyChangedEventArgs("Playlists"));
 		}
 
-		private void UpdateCurrentStatus()
+		public void UpdateCurrentStatus()
 		{
 			var wc = new WebClient();
 
@@ -109,7 +109,7 @@ namespace iTunesRemote.WindowsPhone.Service
 
 				);
 
-			wc.OpenReadAsync(new Uri(_baseUri + "currentstatus"));
+			wc.OpenReadAsync(new Uri(_baseUri + "currentstatus" + "?" + Guid.NewGuid()));
 		}
 
 		public void PlayPause()
