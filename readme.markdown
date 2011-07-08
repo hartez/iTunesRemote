@@ -25,7 +25,7 @@ Dependencies
 
 Installation
 ------------
-For the agent, build and run the setup project on the machine with iTunes.
+For the agent, build and run the setup project on the machine with iTunes. If you're on Windows Vista or Windows 7, once you've installed the application, you'll need to reserve a URL for it. In the installation folder you should find a file called 'setupurl.bat'; simply modify that file to use the correct IP address and machine name, then run it (you'll likely need to run it as administrator). 
 For the WP7 application, you'll need to deploy to your phone using Visual Studio 2010.
 
 Disclaimer
