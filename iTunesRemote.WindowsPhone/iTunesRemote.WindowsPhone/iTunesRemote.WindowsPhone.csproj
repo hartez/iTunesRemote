@@ -48,9 +48,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EZLibrary.WindowsPhone">
-      <HintPath>..\lib\EZLibrary.WindowsPhone.dll</HintPath>
-    </Reference>
     <Reference Include="GalaSoft.MvvmLight.Extras.WP7">
       <HintPath>..\packages\MvvmLight.3.0.2\lib\sl3-wp\GalaSoft.MvvmLight.Extras.WP7.dll</HintPath>
     </Reference>
@@ -127,6 +124,10 @@
     <ProjectReference Include="..\..\iTunesModel.WindowsPhone\iTunesModel.WindowsPhone.csproj">
       <Project>{BC51C212-BA13-43ED-9ECD-08A147F8B07B}</Project>
       <Name>iTunesModel.WindowsPhone</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\lib\EZLibrary\EZLibrary.WindowsPhone\EZLibrary.WindowsPhone.csproj">
+      <Project>{C04B3D51-3C88-4095-9D2E-72225F660E16}</Project>
+      <Name>EZLibrary.WindowsPhone</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />

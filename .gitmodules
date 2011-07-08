@@ -1,0 +1,3 @@
+[submodule "iTunesRemote.WindowsPhone/lib/EZLibrary"]
+	path = iTunesRemote.WindowsPhone/lib/EZLibrary
+	url = https://github.com/hartez/EZLibrary
